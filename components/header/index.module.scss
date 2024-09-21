@@ -1,0 +1,18 @@
+@import "@/styles/_consts";
+
+header.header {
+    background-color: $bg-color-dark;
+    border-radius: $border;
+}
+.logo {
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-color-dark;
+        span {
+            background-color: $bg-color-blue;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    }
+}
