@@ -77,6 +77,7 @@ const Button: React.FC<Props> = ({
                 border: hovered ? borderHover : border,
                 borderRadius,
                 transition,
+                boxSizing: 'border-box'
             }}
             onMouseEnter={() => {
                 setHovered(true);

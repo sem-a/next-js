@@ -1,11 +1,10 @@
 
 
-const Home = () => {
+const Choose = () => {
     return (
         <>
-
         </>
     );
 };
 
-export default Home;
+export default Choose;

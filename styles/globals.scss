@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
-
+@import "@/styles/_consts";
 /* Reset and base styles  */
 * {
     padding: 0px;
@@ -14,7 +14,9 @@
 }
 
 body {
-	font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
+    background-color: #eff1f2;
+    color: $bg-color-dark;
 }
 
 /* Links */

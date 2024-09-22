@@ -7,6 +7,19 @@ type Props = {
     fontSize?: string | undefined;
 };
 
+export const H2: React.FC<Props> = ({
+    children,
+    color,
+    textAlign,
+    fontSize,
+}) => {
+    return (
+        <h2 className={styles.title} style={{ color, textAlign, fontSize }}>
+            {children}
+        </h2>
+    );
+};
+
 export const H3: React.FC<Props> = ({
     children,
     color,
