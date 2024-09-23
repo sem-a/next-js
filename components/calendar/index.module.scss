@@ -1,0 +1,92 @@
+@import "@/styles/_consts";
+
+$border: 1px solid #e0e0e0;
+$widthCell: 63px;
+
+.container {
+    width: 100%;
+    position: relative;
+    display: table;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: $borderRadius;
+}
+.cell {
+    position: relative;
+    display: table-cell;
+    width: 12.5%;
+    padding: 21px 0;
+    text-align: center;
+}
+.rowHeader {
+    display: table-row;
+    .cell {
+        border-right: $border;
+        &:last-child {
+            border-right: none;
+        }
+    }
+}
+.row {
+    display: table-row;
+    .cell {
+        border-right: $border;
+        border-bottom: $border;
+        height: 60px;
+        &:last-child {
+            border-right: none;
+        }
+    }
+    .timeLabel {
+        border-bottom: none;
+        text-align: center;
+        p {
+            font-size: 12px;
+            color: #969696;
+            position: absolute;
+            bottom: 0;
+            right: 14px;
+            transform: translateY(50%);
+        }
+    }
+    &:last-child {
+        .cell {
+            border-bottom: none;
+        }
+    }
+}
+
+.currentDay {
+    position: relative;
+    &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 30%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: red;
+    }
+}
+
+.currentTimeLine {
+    position: absolute;
+    background-color: red; // Цвет линии
+    height: 2px; // высота линии
+    width: 87.5%; // ширина лини
+    right: 0;
+    z-index: 10;
+}
+.currentTimeLine::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, calc(-50% + 1px));
+}
