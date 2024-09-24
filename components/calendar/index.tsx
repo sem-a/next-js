@@ -52,6 +52,8 @@ const Calendar: React.FC = () => {
     ]);
     const [day, setDay] = useState<number>(0);
     const [timeCurr, setTimeCurr] = useState<number>(1);
+    const [position, setPosition] = useState({ top: 0 });
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const handleButtonlClick = (day: number, timeCurr: number) => {
         let totalSumTime = 0;
@@ -103,34 +105,61 @@ const Calendar: React.FC = () => {
         setBlocks((prev) => prev.filter((b) => b.id !== id));
     };
 
+    const [draggingBlock, setDraggingBlock] = useState<number | null>(null);
+
     const handleMouseDown = (id: number) => {
-        const block = blocks.find(b => b.id === id);
-        if (!block) return;
-
-        const onMouseMove = (e: any) => {
-            const newTop = Math.min(
-                Math.max(block.top + Math.floor(e.movementY / 5) * 5, 0), // Не даем уехать выше 0
-                containerHeight - block.height // Не даем уехать ниже границ контейнера
-            );
-
-            setBlocks((prevBlocks) => 
-                prevBlocks.map((b) => 
-                    b.id === id ? { ...b, top: newTop } : b
-                )
-            );
-        };
-
-        const onMouseUp = () => {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-        };
-
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
+        setDraggingBlock(id);
     };
 
-    const containerHeight = 600; // Высота вашего контейнера
+    const handleMouseMove = (event: MouseEvent) => {
+        if (draggingBlock !== null) {
+            const blockIndex = blocks.findIndex(
+                (block) => block.id === draggingBlock
+            );
 
+            const currentBlock = blocks[blockIndex];
+
+            let top = event.clientY - position.top - currentBlock.height / 2;
+
+            if (top < 0) top = 0;
+
+            setBlocks((prevBlocks) =>
+                prevBlocks.map((block) =>
+                    block.id === draggingBlock
+                        ? {
+                              ...block,
+                              top: top,
+                          }
+                        : block
+                )
+            );
+        }
+    };
+
+    const handleMouseUp = (e: any) => {
+        if (draggingBlock !== null) {
+            const blockIndex = blocks.findIndex(
+                (block) => block.id === draggingBlock
+            );
+
+            const currentBlock = blocks[blockIndex];
+
+            const top = e.clientY - position.top - currentBlock.height / 2;
+
+            // Определяем ближайшую кратную 5 высоту
+            const nearestMultiple = top > 0 ? Math.round(top / 5) * 5 : 0;
+
+            setBlocks((prevBlocks) =>
+                prevBlocks.map((block) =>
+                    block.id === draggingBlock
+                        ? { ...block, top: nearestMultiple }
+                        : block
+                )
+            );
+        }
+
+        setDraggingBlock(null); // Завершаем перетаскивание
+    };
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -140,10 +169,19 @@ const Calendar: React.FC = () => {
             setCurrentDay(now.getDay() === 0 ? 6 : now.getDay() - 1);
         }, 60000);
 
+        if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setPosition({ top: rect.top });
+        }
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+
         return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
             clearInterval(interval);
         };
-    }, []);
+    }, [draggingBlock]);
 
     return (
         <>
@@ -200,7 +238,11 @@ const Calendar: React.FC = () => {
                     ))}
                 </div>
             </div>
-            <div className={styles.container} style={{ marginTop: "13px" }}>
+            <div
+                ref={containerRef}
+                className={styles.container}
+                style={{ marginTop: "13px" }}
+            >
                 {hoursOfDay.map((hour, hourIndex) => {
                     if (hourIndex === 23) {
                         return (
@@ -265,7 +307,8 @@ const Calendar: React.FC = () => {
                             onMouseDown={() => handleMouseDown(block.id)}
                         >
                             <Text color="white">
-                                {Math.floor(block.top / 60)}:{block.top % 60}
+                                {("0" + Math.floor(block.top / 60)).slice(-2)}:
+                                {("0" + (block.top % 60)).slice(-2)}
                             </Text>
                         </div>
                     ))}
