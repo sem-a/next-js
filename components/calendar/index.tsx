@@ -4,6 +4,7 @@ import Container from "../container";
 import { FormFlex, FormItem, Label, Select } from "../form-items";
 import Button from "../button";
 import { borderRadius, colorMain, colorMainHover } from "../_const/_const";
+import { Text } from "../title";
 
 const MAX_LENGHT = 3;
 const MIN_HEIGHT = 60;
@@ -27,6 +28,11 @@ type Block = {
     top: number;
 };
 
+type Time = {
+    value: number;
+    title: number;
+};
+
 const Calendar: React.FC = () => {
     const [currentHour, setCurrentHour] = useState<number>(
         new Date().getHours()
@@ -40,38 +46,91 @@ const Calendar: React.FC = () => {
     const [blocks, setBlocks] = useState<Block[]>([]);
     const [time, setTime] = useState([
         { value: 1, title: 1 },
-        { value: 1, title: 1.5 },
-        { value: 1, title: 2 },
-        { value: 1, title: 3 },
+        { value: 1.5, title: 1.5 },
+        { value: 2, title: 2 },
+        { value: 3, title: 3 },
     ]);
-    const [day, setDay] = useState<number>(1);
+    const [day, setDay] = useState<number>(0);
     const [timeCurr, setTimeCurr] = useState<number>(1);
 
-    const handleButtonlClick = (day: number, time: number) => {
-        if (blocks.length === MAX_LENGHT) {
-            alert("Достигнут лимит занятий");
-            return;
-        }
+    const handleButtonlClick = (day: number, timeCurr: number) => {
+        let totalSumTime = 0;
+        let filtredTime: Time[];
 
         let width = document.getElementById("cell")?.offsetWidth || 100;
-
-        console.log(day, time)
 
         const newBlock = {
             id: Date.now(),
             width: width,
-            height: MIN_HEIGHT * time,
-            time: time,
+            height: MIN_HEIGHT * timeCurr,
+            time: timeCurr,
             day,
             top: 0,
         };
-        console.log(newBlock);
+
+        blocks.forEach((block) => {
+            totalSumTime += block.time;
+        });
+        if (totalSumTime === MAX_LENGHT) {
+            alert("Превышен лимит занятий");
+            return;
+        }
+        totalSumTime += newBlock.time;
+
+        switch (totalSumTime) {
+            case 1:
+                filtredTime = time.filter(
+                    (item) => item.value === 1 || item.value === 2
+                );
+                setTime(filtredTime);
+                break;
+            case 2:
+                filtredTime = time.filter((item) => item.value === 1);
+                setTime(filtredTime);
+                break;
+            case 1.5:
+                filtredTime = time.filter((item) => item.value === 1.5);
+                setTime(filtredTime);
+                break;
+            default:
+                break;
+        }
+
         setBlocks([...blocks, newBlock]);
     };
 
     const handleCellDoubleClick = (id: number) => {
         setBlocks((prev) => prev.filter((b) => b.id !== id));
     };
+
+    const handleMouseDown = (id: number) => {
+        const block = blocks.find(b => b.id === id);
+        if (!block) return;
+
+        const onMouseMove = (e: any) => {
+            const newTop = Math.min(
+                Math.max(block.top + Math.floor(e.movementY / 5) * 5, 0), // Не даем уехать выше 0
+                containerHeight - block.height // Не даем уехать ниже границ контейнера
+            );
+
+            setBlocks((prevBlocks) => 
+                prevBlocks.map((b) => 
+                    b.id === id ? { ...b, top: newTop } : b
+                )
+            );
+        };
+
+        const onMouseUp = () => {
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+    };
+
+    const containerHeight = 600; // Высота вашего контейнера
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -94,7 +153,7 @@ const Calendar: React.FC = () => {
                         <Label htmlFor="day">Выберите день: </Label>
                         <Select
                             onChange={(e) => {
-                                setDay(Number());
+                                setDay(Number(e.target.value));
                             }}
                             id="day"
                             options={daysOfWeek}
@@ -105,6 +164,7 @@ const Calendar: React.FC = () => {
                         <Select
                             onChange={(e) => {
                                 setTimeCurr(Number(e.target.value));
+                                console.log(timeCurr);
                             }}
                             id="time"
                             options={time}
@@ -190,38 +250,23 @@ const Calendar: React.FC = () => {
                                 left: `${
                                     block.width + 7 + block.day * block.width
                                 }px`,
-                                background: "blue",
+                                background: "#287effc2",
                                 height: block.height,
                                 width: block.width - 14,
                                 zIndex: "10px",
                                 borderRadius: "18px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                             }}
                             onDoubleClick={() =>
                                 handleCellDoubleClick(block.id)
                             }
+                            onMouseDown={() => handleMouseDown(block.id)}
                         >
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: block.width - 14,
-                                    height: "10px",
-                                    background: "red",
-                                    borderRadius: "18px",
-                                }}
-                            ></div>
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    bottom: 0,
-                                    left: 0,
-                                    width: block.width - 14,
-                                    height: "10px",
-                                    background: "red",
-                                    borderRadius: "18px",
-                                }}
-                            ></div>
+                            <Text color="white">
+                                {Math.floor(block.top / 60)}:{block.top % 60}
+                            </Text>
                         </div>
                     ))}
                 </div>
