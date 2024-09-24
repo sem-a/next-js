@@ -1,5 +1,8 @@
 export const textColorForDark = "#dddddd";
 export const textColorDarkForDark = "#67749e";
+export const colorMain = "#287eff";
+export const colorMainHover = "#236fe2"
+export const borderRadius = "28px";
 
 export const instructionList = [
     {
@@ -8,6 +11,14 @@ export const instructionList = [
     },
     {
         id: 1,
-        text: "В поле «День недели» выбираете нужный Вам день. Далее в поле «Время» выбираем продолжительность занятия от 1 до 3 часов",
-    }
+        text: "В поле «День недели» выбираете нужный Вам день. Далее в поле «Время» выбираете продолжительность занятия от 1 до 3 часов и нажимаете добавить",
+    },
+    {
+        id: 2,
+        text: "Теперь слот можно перемещать по календарю и выбрать удобное для вас время",
+    },
+    {
+        id: 3,
+        text: "Сохранять ничего не нужно. Можете перейти во вкладку «Мое расписание»",
+    },
 ];

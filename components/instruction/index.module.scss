@@ -1,0 +1,13 @@
+ul.list {
+    list-style: none;
+    margin-left: 28px;
+    font-size: 13px;
+    li:before {
+        content:  "—";
+        position: relative;
+        left:-5px;
+    }
+    li {
+        margin-top: 13px;
+    }
+}
